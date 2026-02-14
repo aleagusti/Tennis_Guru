@@ -23,18 +23,38 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # MAJOR: breaking architecture changes
 # MINOR: new features (e.g., validation layer, benchmark hooks)
 # PATCH: bug fixes or small prompt adjustments
-VERSION = "0.1.0"
+VERSION = "0.2.2"
 
 """
 Changelog:
 0.1.0
 - Added schema introspection
-- Added SQL validation
+- Added SQL safety validation (SELECT-only)
 - Added complexity detector
 - Added automatic simplification
 - Added ambiguity detection
 - Added timeout protection
+
+0.2.0
+- Added simple in-memory query cache (same-process)
+
+0.2.1
+- Added benchmark hooks (needs_clarification / logging compatibility)
+
+0.2.2
+- Fixed schema validation false-positives for double-quoted literals
+- Added interactive REPL loop so multiple questions can be asked without re-running the script
+- Cache results for numeric + name outputs (not only the generic-table fallback)
 """
+
+# =========================
+# SIMPLE QUERY CACHE
+# =========================
+# In-memory cache to avoid regenerating SQL and re-running
+# identical questions within the same process.
+# Key: normalized question string
+# Value: dict with sql + results
+QUERY_CACHE = {}
 
 # NOTE:
 # This module is intentionally minimal.
@@ -132,14 +152,24 @@ def get_db_schema() -> dict:
 def extract_identifiers(sql: str) -> set:
     """
     Extract potential column identifiers from SQL.
+    Ignores string literals and basic SQL keywords.
     This is heuristic-based and not a full SQL parser.
     """
-    tokens = re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", sql)
+
+    # Remove string literals to avoid false positives
+    # - single quotes: 'text'
+    # - double quotes: "text" (LLMs sometimes emit these for string literals)
+    sql_no_strings = re.sub(r"'[^']*'", "", sql)
+    sql_no_strings = re.sub(r'"[^"]*"', "", sql_no_strings)
+
+    tokens = re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", sql_no_strings)
+
     keywords = {
         "select", "from", "where", "and", "or", "not", "in",
         "exists", "join", "on", "group", "by", "order", "limit",
         "as", "desc", "asc", "count", "distinct"
     }
+
     return {t for t in tokens if t.lower() not in keywords}
 
 
@@ -359,6 +389,20 @@ def run_query(sql: str, timeout_seconds: int = 30):
 
 def ask(question: str):
     # Step 0: Ask for clarification on subjective/ambiguous questions
+
+    # Normalize question for caching
+    normalized_q = question.strip().lower()
+
+    # Check cache first
+    if normalized_q in QUERY_CACHE:
+        cached = QUERY_CACHE[normalized_q]
+        print("\n⚡ Cached result used (no LLM call, no DB hit).")
+        print("\n--- Generated SQL ---\n")
+        print(cached["sql"])
+        print("\n--- Results ---\n")
+        for row in cached["results"]:
+            print(" | ".join(str(col) for col in row))
+        return cached["results"]
     if is_question_ambiguous(question):
         print("\n⚠️ This question is ambiguous and needs a definition of the metric.")
         print("Choose one metric so I can answer reliably:")
@@ -477,6 +521,11 @@ Do not mention SQL.
             # Fallback if LLM fails
             print(f"Result: {numeric_result}")
 
+        # Store in cache
+        QUERY_CACHE[normalized_q] = {
+            "sql": sql,
+            "results": results
+        }
         return results
 
     # If name pairs
@@ -512,15 +561,34 @@ Do not mention SQL.
             for row in results:
                 print(f"{row[0]} {row[1]}")
 
+        # Store in cache
+        QUERY_CACHE[normalized_q] = {
+            "sql": sql,
+            "results": results
+        }
         return results
 
     # Fallback for generic tables
     for row in results:
         print(" | ".join(str(col) for col in row))
 
+    # Store in cache
+    QUERY_CACHE[normalized_q] = {
+        "sql": sql,
+        "results": results
+    }
     return results
 
 
 if __name__ == "__main__":
-    user_question = input("Ask Tennis Guru: ")
-    ask(user_question)
+    while True:
+        user_question = input("Ask Tennis Guru (or type 'exit'): ").strip()
+
+        if not user_question:
+            continue
+
+        if user_question.lower() in {"exit", "quit", "q"}:
+            print("Bye! 🎾")
+            break
+
+        ask(user_question)

@@ -2,7 +2,7 @@ __pycache__/
 *.pyc
 
 venv/
-.env/
+.env
 
 data/raw/
 data/staging/
@@ -12,3 +12,5 @@ data/staging/
 
 .vscode/
 .idea/
+
+logs/*.json

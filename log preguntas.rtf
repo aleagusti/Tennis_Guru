@@ -1,0 +1,517 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh11780\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 (base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: Cuantas finales de Grand Slam gano Roger Federer?\
+\
+--- Generated SQL ---\
+\
+SELECT COUNT(*) \
+FROM matches \
+WHERE tourney_level = 'G' AND round = 'F' AND winner_id = (SELECT player_id FROM players WHERE first_name = 'Roger' AND last_name = 'Federer');\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+Roger Federer gan\'f3 20 finales de Grand Slam.\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfCu\'e1ntos t\'edtulos de Grand Slam gan\'f3 Nadal en polvo de ladrillo?\
+\
+--- Generated SQL ---\
+\
+SELECT COUNT(*) \
+FROM matches \
+WHERE winner_id = (SELECT player_id FROM players WHERE first_name = 'Rafael' AND last_name = 'Nadal') \
+AND tourney_level = 'G' \
+AND round = 'F' \
+AND surface = 'Clay';\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+Rafael Nadal gan\'f3 14 t\'edtulos de Grand Slam en polvo de ladrillo.\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfCu\'e1ntas finales jug\'f3 Djokovic antes de 2010?\
+\
+--- Generated SQL ---\
+\
+SELECT COUNT(*) \
+FROM matches \
+WHERE winner_id = (SELECT player_id FROM players WHERE first_name = 'Novak' AND last_name = 'Djokovic') \
+AND match_date < '2010-01-01' \
+AND tourney_level = 'G' \
+AND round = 'F';\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+Antes de 2010, Djokovic jug\'f3 una final.\
+(base) alejandroagusti@MacBook-Air tennis-guru % src/core/nl_query.py\
+zsh: permission denied: src/core/nl_query.py\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfCu\'e1ntos partidos gan\'f3 Federer siendo top 3?\
+\
+--- Generated SQL ---\
+\
+SELECT COUNT(*) \
+FROM matches \
+WHERE winner_id = (SELECT player_id FROM players WHERE first_name = 'Roger' AND last_name = 'Federer') \
+AND winner_rank <= 3;\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+Federer gan\'f3 925 partidos mientras estuvo en el top 3.\
+(base) alejandroagusti@MacBook-Air tennis-guru % src/core/nl_query.py\
+zsh: permission denied: src/core/nl_query.py\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfCu\'e1ntas finales gan\'f3 Federer cuando era n\'famero 1?\
+\
+--- Generated SQL ---\
+\
+SELECT COUNT(*) \
+FROM matches \
+WHERE tourney_level = 'G' \
+AND round = 'F' \
+AND winner_id = (SELECT player_id FROM players WHERE first_name = 'Roger' AND last_name = 'Federer') \
+AND winner_id IN (SELECT player_id FROM rankings WHERE rank = 1 AND gender = 'ATP');\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+Federer gan\'f3 20 finales cuando era n\'famero 1.\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfCu\'e1ntos partidos perdi\'f3 Nadal contra jugadores top 10 en ese momento?\
+\
+--- Generated SQL ---\
+\
+SELECT COUNT(*) \
+FROM matches \
+WHERE loser_id = (SELECT player_id FROM players WHERE first_name = 'Rafael' AND last_name = 'Nadal') \
+AND loser_rank <= 10 \
+AND match_date = (SELECT MAX(match_date) \
+                  FROM matches AS m2 \
+                  WHERE m2.loser_id = matches.loser_id \
+                  AND m2.match_date <= matches.match_date);\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+Rafael Nadal ha perdido 191 partidos contra jugadores que estaban en el top 10 en ese momento.\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfCu\'e1ntos t\'edtulos gan\'f3 Djokovic siendo menor de 25 a\'f1os?\
+\
+--- Generated SQL ---\
+\
+SELECT COUNT(*) \
+FROM matches \
+WHERE winner_id = (SELECT player_id FROM players WHERE first_name = 'Novak' AND last_name = 'Djokovic') \
+AND tourney_level = 'G' \
+AND round = 'F' \
+AND match_date < (SELECT dob FROM players WHERE first_name = 'Novak' AND last_name = 'Djokovic') + INTERVAL '25 years';\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+\uc0\u10060  Database execution error.\
+near "'25 years'": syntax error\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfQui\'e9n fue n\'famero 1 sin ganar ning\'fan Masters 1000?\
+\
+--- Generated SQL ---\
+\
+SELECT p.first_name, p.last_name \
+FROM players p \
+WHERE p.player_id IN (\
+    SELECT r.player_id \
+    FROM rankings r \
+    WHERE r.rank = 1 \
+    AND r.gender = 'ATP' \
+    AND r.player_id NOT IN (\
+        SELECT DISTINCT m.winner_id \
+        FROM matches m \
+        WHERE m.tourney_level = 'M' \
+    )\
+)\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+No results found.\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfQu\'e9 jugadores ganaron un Grand Slam pero nunca fueron n\'famero 1?\
+\
+--- Generated SQL ---\
+\
+SELECT p.player_id, p.first_name, p.last_name\
+FROM players p\
+WHERE p.player_id IN (\
+    SELECT DISTINCT m.winner_id\
+    FROM matches m\
+    WHERE m.tourney_level = 'G' AND m.round = 'F'\
+) AND p.player_id NOT IN (\
+    SELECT r.player_id\
+    FROM rankings r\
+    WHERE r.rank = 1\
+)\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+100016 | Ken | Rosewall\
+100026 | Andres | Gimeno\
+100029 | Rod | Laver\
+100074 | Arthur | Ashe\
+100079 | Bill | Bowrey\
+100113 | Jan | Kodes\
+100126 | Stan | Smith\
+100174 | Manuel | Orantes\
+100214 | Adriano | Panatta\
+100255 | Roscoe | Tanner\
+100282 | Guillermo | Vilas\
+100337 | Mark | Edmondson\
+100342 | Vitas | Gerulaitis\
+100360 | Brian | Teacher\
+100532 | Johan | Kriek\
+100653 | Andres | Gomez\
+100676 | Yannick | Noah\
+101138 | Pat | Cash\
+101434 | Petr | Korda\
+101529 | Michael | Stich\
+101843 | Sergi | Bruguera\
+101964 | Goran | Ivanisevic\
+101990 | Richard | Krajicek\
+102021 | Michael | Chang\
+102563 | Thomas | Johansson\
+102610 | Albert | Costa\
+103292 | Gaston | Gaudio\
+104527 | Stan | Wawrinka\
+105223 | Juan Martin | del Potro\
+105227 | Marin | Cilic\
+106233 | Dominic | Thiem\
+200049 | Amer Mohamed | Abdo\
+200049 | Conchita | Martinez\
+200096 | Dragos Nicolae | Madaras\
+200096 | Mary | Pierce\
+200144 | Joao | Marques\
+200144 | Margaret | Court\
+200150 | Michael | Chaker\
+200150 | Evonne | Goolagong\
+200176 | Manish | Sureshkumar\
+200176 | Kerry | Reid\
+200190 | Nathan | Martinet\
+200190 | Billie Jean | King\
+200193 | Luiz Fernando | Faria\
+200193 | Ann | Jones\
+200237 | Lourenzo | Gasperini\
+200237 | Virginia | Wade\
+200256 | Dan | Skacel\
+200256 | Chris | Oneil\
+200266 | Javier | Barranco Cosano\
+200266 | Sue | Barker\
+200337 | Yi Wei | Huang\
+200337 | Virginia | Ruzici\
+200344 | Louis | Quennessen\
+200344 | Barbara | Jordan\
+200348 | Konstantin | Kirovski\
+200348 | Hana | Mandlikova\
+200371 | Lucas | Grego\
+200371 | Mima | Jausovec\
+200397 | Hindolo | Karim\
+200397 | Tracy | Austin\
+200539 | Konstantinos | Ilia\
+200539 | Jana | Novotna\
+200572 | Nick | Hardt\
+200572 | Gabriela | Sabatini\
+200723 | Mario | Trnovsky\
+200723 | Iva | Majoli\
+200772 | Johann Georg | Frankhauser\
+200772 | Anastasia | Myskina\
+200829 | Ivor | Lagzins\
+200829 | Nancy | Richey\
+201212 | Johan | De Muynck\
+201212 | Francesca | Schiavone\
+201294 | David | Saceanu\
+201294 | Marion | Bartoli\
+201320 | Martin | Chajdas\
+201320 | Svetlana | Kuznetsova\
+201325 | A | Aziz\
+201325 | Samantha | Stosur\
+201355 | Patrick | Steiner\
+201355 | Flavia | Pennetta\
+201419 | Luis | Valcacel\
+201419 | Na | Li\
+201520 | Benoit | Bouchet\
+201520 | Petra | Kvitova\
+201585 | None | Vicens\
+201585 | Sloane | Stephens\
+206173 | Jannik | Sinner\
+206173 | Beatrice | Lombardo\
+206252 | Asaf | Dori\
+206252 | Barbora | Krejcikova\
+211533 | Gianluca | Cadenasso \
+211533 | Jelena | Ostapenko\
+213550 | Connor | Smillie\
+213550 | Sofia | Kenin\
+214954 | Marketa | Vondrousova\
+214981 | Elena | Rybakina\
+215370 | Bianca | Andreescu\
+221054 | Emma | Raducanu\
+221103 | Coco | Gauff\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfQu\'e9 jugadores fueron n\'famero 1 y nunca vencieron a Federer?\
+\
+--- Generated SQL ---\
+\
+SELECT p.first_name, p.last_name \
+FROM players p \
+WHERE p.player_id IN (\
+    SELECT r.player_id \
+    FROM rankings r \
+    WHERE r.rank = 1 \
+) \
+AND p.player_id NOT IN (\
+    SELECT m.winner_id \
+    FROM matches m \
+    WHERE m.loser_id = (SELECT player_id FROM players WHERE first_name = 'Roger' AND last_name = 'Federer')\
+);\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+\uc0\u9888 \u65039  Query deemed too complex. Attempting automatic simplification...\
+\
+--- Simplified SQL ---\
+\
+SELECT p.first_name, p.last_name \
+FROM players p \
+JOIN rankings r ON p.player_id = r.player_id \
+WHERE r.rank = 1 \
+AND p.player_id NOT IN (\
+    SELECT m.winner_id \
+    FROM matches m \
+    WHERE m.loser_id = (SELECT player_id FROM players WHERE first_name = 'Roger' AND last_name = 'Federer')\
+);\
+\
+--- Results ---\
+\
+Los jugadores que fueron n\'famero 1 y nunca vencieron a Federer son: Ilie Nastase, John Newcombe, Jimmy Connors, Bjorn Borg, John McEnroe, Ivan Lendl, Mats Wilander, Marcelo R\'edos, Carlos Moy\'e1, y Daniil Medvedev.\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfQui\'e9n tiene mejor r\'e9cord en finales de Grand Slam: Federer o Nadal?\
+\
+--- Generated SQL ---\
+\
+SELECT \
+    p.first_name, \
+    p.last_name, \
+    COUNT(m.match_id) AS finals_won\
+FROM \
+    players p\
+JOIN \
+    matches m ON p.player_id = m.winner_id\
+WHERE \
+    m.tourney_level = 'G' AND m.round = 'F' AND (p.first_name = 'Roger' AND p.last_name = 'Federer' OR p.first_name = 'Rafael' AND p.last_name = 'Nadal')\
+GROUP BY \
+    p.player_id\
+ORDER BY \
+    finals_won DESC;\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+\uc0\u9888 \u65039  Query deemed too complex. Attempting automatic simplification...\
+\
+--- Simplified SQL ---\
+\
+SELECT \
+    p.first_name, \
+    p.last_name, \
+    COUNT(m.match_id) AS finals_won\
+FROM \
+    players p\
+JOIN \
+    matches m ON p.player_id = m.winner_id\
+WHERE \
+    m.tourney_level = 'G' AND m.round = 'F' \
+    AND p.first_name IN ('Roger', 'Rafael') \
+    AND p.last_name IN ('Federer', 'Nadal')\
+GROUP BY \
+    p.player_id\
+ORDER BY \
+    finals_won DESC;\
+\
+--- Results ---\
+\
+Rafael | Nadal | 22\
+Roger | Federer | 20\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfCu\'e1l fue el a\'f1o m\'e1s dominante de Djokovic en t\'e9rminos de t\'edtulos?\
+\
+--- Generated SQL ---\
+\
+SELECT strftime('%Y', match_date) AS year, COUNT(*) AS titles\
+FROM matches\
+WHERE winner_id = (SELECT player_id FROM players WHERE first_name = 'Novak' AND last_name = 'Djokovic')\
+GROUP BY year\
+ORDER BY titles DESC\
+LIMIT 1;\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+2015 | 83\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfQu\'e9 jugador tiene mejor porcentaje de victorias contra top 5?\
+\
+--- Generated SQL ---\
+\
+SELECT p.player_id, p.first_name, p.last_name, \
+       COUNT(m.match_id) AS total_matches, \
+       SUM(CASE WHEN m.winner_id = p.player_id THEN 1 ELSE 0 END) AS wins, \
+       (SUM(CASE WHEN m.winner_id = p.player_id THEN 1 ELSE 0 END) * 1.0 / COUNT(m.match_id)) * 100 AS win_percentage\
+FROM players p\
+JOIN matches m ON p.player_id IN (m.winner_id, m.loser_id)\
+WHERE (m.winner_rank <= 5 OR m.loser_rank <= 5)\
+GROUP BY p.player_id\
+ORDER BY win_percentage DESC;\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+\uc0\u9888 \u65039  Query deemed too complex. Attempting automatic simplification...\
+\
+--- Simplified SQL ---\
+\
+SELECT p.player_id, p.first_name, p.last_name, \
+       COUNT(m.match_id) AS total_matches, \
+       SUM(CASE WHEN m.winner_id = p.player_id THEN 1 ELSE 0 END) AS wins, \
+       (SUM(CASE WHEN m.winner_id = p.player_id THEN 1 ELSE 0 END) * 1.0 / COUNT(m.match_id)) * 100 AS win_percentage\
+FROM players p\
+JOIN matches m ON p.player_id IN (m.winner_id, m.loser_id)\
+WHERE (m.winner_rank <= 5 OR m.loser_rank <= 5)\
+  AND m.round = 'F'\
+  AND m.tourney_level = 'G'\
+  AND m.winner_id NOT IN (SELECT winner_id FROM matches WHERE m.round = 'F' AND m.tourney_level = 'G')\
+GROUP BY p.player_id\
+ORDER BY win_percentage DESC;\
+\
+--- Results ---\
+\
+No results found.\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfQui\'e9n fue el mejor jugador sin ganar un Grand Slam?\
+\
+--- Generated SQL ---\
+\
+SELECT p.first_name, p.last_name \
+FROM players p \
+WHERE p.player_id NOT IN (\
+    SELECT winner_id \
+    FROM matches \
+    WHERE tourney_level = 'G' AND round = 'F'\
+) \
+ORDER BY (SELECT MAX(rank) \
+            FROM rankings r \
+            WHERE r.player_id = p.player_id) DESC \
+LIMIT 1;\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+Uno de los mejores jugadores que nunca gan\'f3 un Grand Slam es Aria Harajchi.\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfQui\'e9n fue m\'e1s dominante en su prime?\
+\
+--- Generated SQL ---\
+\
+SELECT p.first_name, p.last_name\
+FROM players p\
+WHERE p.player_id IN (\
+    SELECT player_id\
+    FROM rankings r\
+    WHERE r.rank = (\
+        SELECT MIN(rank)\
+        FROM rankings r2\
+        WHERE r2.player_id = r.player_id\
+    )\
+)\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+\uc0\u10060  Database execution error.\
+interrupted\
+(base) alejandroagusti@MacBook-Air tennis-guru % python src/core/nl_query.py\
+Loaded API key: True\
+Ask Tennis Guru: \'bfCu\'e1l fue la mayor sorpresa en un Grand Slam?\
+\
+--- Generated SQL ---\
+\
+SELECT m.match_id, m.tourney_name, m.match_date, p.first_name, p.last_name\
+FROM matches m\
+JOIN players p ON m.winner_id = p.player_id\
+WHERE m.tourney_level = 'G'\
+ORDER BY m.match_date DESC\
+LIMIT 1;\
+\
+--- Explanation ---\
+\
+SQL generated from natural language question.\
+\
+--- Results ---\
+\
+194108 | Us Open | 2024-08-26 00:00:00 | Jannik | Sinner}

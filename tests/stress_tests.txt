@@ -1,0 +1,84 @@
+[L1][basic-filter]
+How many Grand Slam finals did Roger Federer win?
+
+[L1][basic-filter]
+How many Grand Slam titles did Rafael Nadal win?
+
+[L1][surface-filter]
+How many Grand Slam titles did Nadal win on clay?
+
+[L1][date-filter]
+How many matches did Novak Djokovic win before 2010?
+
+[L1][round-filter]
+How many finals did Andy Murray play?
+
+[L1][tourney-level]
+How many Masters 1000 titles did Federer win?
+
+[L2][temporal-rank]
+How many matches did Federer win while ranked number 1?
+
+[L2][opponent-rank]
+How many matches did Nadal lose against Top 10 players at the time?
+
+[L2][opponent-rank]
+How many finals did Federer win against Top 5 players at the time?
+
+[L2][date-arithmetic]
+How many titles did Djokovic win before turning 25?
+
+[L2][temporal-cutoff]
+How many Grand Slam titles did Federer win after 2010?
+
+[L2][ranking-snapshot]
+How many matches did Djokovic win while ranked outside the Top 10?
+
+[L3][negative-logic]
+Who was number 1 without winning any Grand Slam?
+
+[L3][negative-logic]
+Which players won a Grand Slam but never became world number 1?
+
+[L3][negative-logic]
+Which players reached a Grand Slam final but never won one?
+
+[L3][negative-logic]
+Which players were number 1 but never defeated Federer?
+
+[L3][exclusion]
+Which Grand Slam finals did Nadal lose?
+
+[L4][aggregation]
+Who has more Grand Slam titles, Federer or Nadal?
+
+[L4][aggregation]
+What was Djokovic's most dominant year in terms of titles?
+
+[L4][aggregation]
+Which player has the most Masters 1000 titles?
+
+[L4][aggregation]
+Who has the highest win percentage in Grand Slam finals?
+
+[L4][comparison]
+Between Federer, Nadal and Djokovic, who has the best win percentage against Top 5 players?
+
+[L4][multi-aggregation]
+Which player has the most total titles in a single season?
+
+[L5][subjective]
+Who was the best player without winning a Grand Slam?
+
+[L5][subjective]
+What was the biggest upset in Grand Slam history?
+
+[L5][subjective]
+Who was more dominant in their prime, Federer or Nadal?
+
+[L5][definition-required]
+Who had the strongest era in tennis history?
+
+[L5][definition-required]
+Which player had the most impressive career?
+

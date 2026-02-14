@@ -12,7 +12,29 @@ from openai import RateLimitError, AuthenticationError, APIError
 load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
 print("Loaded API key:", os.getenv("OPENAI_API_KEY") is not None)
 
+
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# =========================
+# VERSIONING
+# =========================
+# Every structural modification to this file must bump VERSION.
+# Follow semantic versioning:
+# MAJOR: breaking architecture changes
+# MINOR: new features (e.g., validation layer, benchmark hooks)
+# PATCH: bug fixes or small prompt adjustments
+VERSION = "0.1.0"
+
+"""
+Changelog:
+0.1.0
+- Added schema introspection
+- Added SQL validation
+- Added complexity detector
+- Added automatic simplification
+- Added ambiguity detection
+- Added timeout protection
+"""
 
 # NOTE:
 # This module is intentionally minimal.

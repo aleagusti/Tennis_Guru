@@ -32,8 +32,64 @@ A4 — Robustness
 	•	Add debug mode (--raw, --debug)
 	•	Persist query history to logs/query_history.json
 
+
 👉 Resultado del Stage A:
 Un motor histórico robusto, presentable en portfolio serio.
+
+---
+
+# 🔥 HIGH PRIORITY — Architectural Refactor (Technical Debt Reduction)
+
+🎯 Objetivo: Profesionalizar la arquitectura interna antes de seguir agregando features.
+
+HP1 — Modularization (Refactor estructural)
+	•	Split nl_query.py into modules:
+		•	intent_router.py
+		•	deterministic_handlers.py
+		•	llm_generator.py
+		•	semantic_validator.py
+		•	sql_validator.py
+		•	executor.py
+		•	memory.py
+	•	Keep nl_query.py as lightweight orchestrator (CLI + engine bootstrap)
+	•	Reduce monolithic file complexity
+	•	Enable unit testing per module
+
+HP2 — Intent Registry System
+	•	Replace conditional intent routing with INTENT_REGISTRY dict
+	•	Map intent → handler function
+	•	Remove large if/elif chains
+	•	Make new deterministic templates plug‑and‑play
+
+HP3 — Context Memory Redesign
+	•	Store structured context:
+		•	last_intent
+		•	last_entities
+		•	last_tourney
+		•	last_year
+	•	Stop relying on raw SQL string matching
+	•	Improve follow‑up question reliability
+
+HP4 — SQL Parsing Upgrade
+	•	Replace fragile regex validation with sqlparse-based inspection
+	•	Detect:
+		•	unwanted round filters
+		•	missing JOIN to players
+		•	dangerous patterns
+	•	Improve robustness of semantic corrections
+
+HP5 — Engine Class Abstraction
+	•	Create TennisGuruEngine class
+	•	Move orchestration logic into process(question)
+	•	Allow future:
+		•	API integration
+		•	Web UI reuse
+		•	Unit testing without CLI
+
+👉 Resultado del HIGH PRIORITY block:
+Base arquitectónica sólida, mantenible y escalable antes de continuar con expansión funcional.
+
+---
 
 # 🔵 STAGE A+ — Research & Benchmark Layer
 
@@ -128,3 +184,35 @@ C5 — Deploy
 
 👉 Resultado del Stage C:
 Tennis Guru como producto web consultable públicamente.
+
+---
+
+# 🟣 STAGE C+ — Entity Resolution & Semantic Layer
+
+🎯 Objetivo: Resolver ambigüedad semántica y profesionalizar el motor NL → SQL.
+
+C+1 — Player Resolution Layer
+	•	Detect player entities before SQL generation
+	•	If only one token detected → treat as last_name
+	•	Query DB to resolve player_id before LLM SQL execution
+	•	If 0 matches → return “Player not found”
+	•	If 1 match → inject explicit player_id into SQL
+	•	If multiple matches → ask clarification question
+	•	Eliminate subqueries like:
+		(SELECT player_id FROM players WHERE ...)
+	•	Replace with explicit ID filters for performance and determinism
+
+C+2 — Ambiguity Detection Framework
+	•	Detect vague terms (best, dominant, strongest era, etc.)
+	•	Require metric definition before SQL execution
+	•	Add clarification-first workflow
+	•	Track clarification rate in benchmark
+
+C+3 — Deterministic Entity Injection
+	•	Pre-resolve entities in Python
+	•	Inject resolved IDs into final SQL
+	•	Reduce LLM hallucination risk
+	•	Improve performance and cache efficiency
+
+👉 Resultado del Stage C+:
+Motor semánticamente robusto con resolución determinística de entidades, listo para nivel producto profesional.

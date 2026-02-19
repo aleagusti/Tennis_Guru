@@ -7,6 +7,32 @@ MAJOR.MINOR.PATCH
 
 ---
 
+## [0.4.0] - 2026-02-18
+
+### Added
+- Structural SQL transformation layer (`sql_transformer.py`) to enforce anti-join policy without using EXISTS / NOT EXISTS
+- Unified domain and SQL policy rules directly inside `llm_generator.py`
+- Default ATP scope enforcement (men’s tour assumed unless WTA explicitly requested)
+- Explicit Grand Slam / round / surface interpretation rules embedded in prompt layer
+
+### Refactored
+- Removed `domain_enforcer.py`
+- Removed `domain_rules.py`
+- Removed `domain_sql_rules.py`
+- Consolidated domain interpretation into LLM prompt contract
+- Simplified `semantic_guard.py` to focus strictly on validation (no structural rewrites)
+- Cleaned `engine.py` to centralize structural enforcement and remove duplicate policy checks
+
+### Improved
+- Stabilized L3 negative-logic queries using LEFT JOIN + HAVING patterns
+- Eliminated EXISTS-based execution interruptions
+- Improved Grand Slam vs ranking anti-join correctness
+- Reduced cross-tour (ATP/WTA) contamination in default queries
+- Increased CLI result visibility for large result sets
+- Improved environment variable loading for OpenAI API key
+
+---
+
 ## [0.3.0] - 2026-02-17
 
 ### Added

@@ -11,12 +11,7 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.core.nl_query import (
-    generate_sql_from_question,
-    run_query,
-    is_query_too_complex,
-    is_question_ambiguous,
-)
+from src.core.engine import TennisGuruEngine
 
 STRESS_FILE = PROJECT_ROOT / "tests" / "stress_tests.txt"
 LOG_DIR = PROJECT_ROOT / "logs"
@@ -71,6 +66,8 @@ def benchmark():
 
     print(f"Running benchmark on {len(questions)} questions...\n")
 
+    engine = TennisGuruEngine()
+
     for item in questions:
         q = item["question"]
         level = item.get("level")
@@ -88,41 +85,30 @@ def benchmark():
             "timeout": False,
             "error": None,
             "needs_clarification": False,
-            "generated_sql": None,
+            "generated_sql": None,   # raw SQL from LLM
+            "final_sql": None,       # SQL after guard + transformer
             "result_sample": None,
             "timestamp": datetime.utcnow().isoformat()
         }
 
-        # Handle ambiguous questions (no SQL should be generated)
-        if is_question_ambiguous(q):
-            entry["needs_clarification"] = True
-            results.append(entry)
-            print("  ↳ Marked as needs_clarification (no SQL executed)")
-            continue
-
         try:
-            # Measure SQL generation time
-            start_llm = time.time()
-            sql, _ = generate_sql_from_question(q)
-            entry["llm_generation_time"] = round(time.time() - start_llm, 4)
-            entry["generated_sql"] = sql
+            start_total = time.time()
+            res = engine.process(q)
+            total_time = round(time.time() - start_total, 4)
 
-            # Detect complexity
-            if is_query_too_complex(sql):
-                entry["simplification_triggered"] = True
+            # Store both raw LLM SQL and final executed SQL
+            entry["generated_sql"] = getattr(res, "generated_sql", None)
+            entry["final_sql"] = res.sql
 
-            # Measure SQL execution time
-            start_sql = time.time()
-            try:
-                rows = run_query(sql)
-                if rows:
-                    entry["result_sample"] = rows[:3]
-            except Exception as e:
-                if "interrupted" in str(e).lower():
-                    entry["timeout"] = True
-                else:
-                    entry["error"] = str(e)
-            entry["sql_execution_time"] = round(time.time() - start_sql, 4)
+            entry["needs_clarification"] = res.needs_clarification
+            entry["error"] = res.error
+
+            # Timing metrics
+            entry["llm_generation_time"] = getattr(res, "llm_generation_time", None)
+            entry["sql_execution_time"] = total_time
+
+            if res.results:
+                entry["result_sample"] = res.results[:3]
 
         except Exception as e:
             entry["error"] = str(e)

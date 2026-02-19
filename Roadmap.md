@@ -4,18 +4,19 @@
 
 A1 — Performance
 	•	Indexes versioned in schema.sql
-	•	Add query execution timer
+	•	Add query execution timer (DONE v0.2.x)
 	•	Add optional EXPLAIN QUERY PLAN debug mode
 	•	Detect and reject extremely expensive queries
-	•	Add structured logging (question, SQL, execution time, simplification triggered)
-	•	Add query benchmark runner
-	•	Track LLM generation time separately from SQL execution time
+	•	Add structured logging (question, SQL, execution time, simplification triggered) (PARTIAL — benchmark logging implemented)
+	•	Add query benchmark runner (DONE v0.2.x)
+	•	Track LLM generation time separately from SQL execution time (DONE v0.2.x)
 
 A2 — Semantic Quality
 	•	Ranking “at the time” rule
-	•	Grand Slam rule
-	•	Force JOIN to players when returning identities
+	•	Grand Slam rule (IMPLEMENTED via semantic validation layer)
+	•	Force JOIN to players when returning identities (PARTIAL — enforced in most deterministic templates)
 	•	Add anti-pattern detection (e.g., ranking_date = match_date)
+	•	Automatic semantic correction layer (round filter removal, surface logic fix) (DONE v0.3.0)
 
 A3 — UX Improvements
 	•	Format numeric results cleanly
@@ -25,18 +26,21 @@ A3 — UX Improvements
 
 A4 — Robustness
 	•	API error handling
-	•	SQL validation
-	•	Add execution timeout
+	•	SQL validation (IMPLEMENTED — structural + semantic validation)
+	•	Add execution timeout (DONE v0.2.x)
 	•	Add max-row safeguard
 	•	Add retry with exponential backoff for OpenAI RateLimitError
 	•	Add debug mode (--raw, --debug)
-	•	Persist query history to logs/query_history.json
+	•	Persist query history to logs/query_history.json (DONE v0.2.x)
+	•	Deterministic template fallback before LLM execution (IMPLEMENTED v0.3.0)
 
 
 👉 Resultado del Stage A:
 Un motor histórico robusto, presentable en portfolio serio.
 
 ---
+
+⚠️ NOTE: Current engine is monolithic (~600+ lines in nl_query.py). Refactor required before Stage B.
 
 # 🔥 HIGH PRIORITY — Architectural Refactor (Technical Debt Reduction)
 
@@ -193,8 +197,8 @@ Tennis Guru como producto web consultable públicamente.
 
 C+1 — Player Resolution Layer
 	•	Detect player entities before SQL generation
-	•	If only one token detected → treat as last_name
-	•	Query DB to resolve player_id before LLM SQL execution
+	•	If only one token detected → treat as last_name (PARTIAL — heuristic implemented but needs DB disambiguation)
+	•	Query DB to resolve player_id before LLM SQL execution (PARTIAL)
 	•	If 0 matches → return “Player not found”
 	•	If 1 match → inject explicit player_id into SQL
 	•	If multiple matches → ask clarification question
@@ -209,8 +213,8 @@ C+2 — Ambiguity Detection Framework
 	•	Track clarification rate in benchmark
 
 C+3 — Deterministic Entity Injection
-	•	Pre-resolve entities in Python
-	•	Inject resolved IDs into final SQL
+	•	Pre-resolve entities in Python (NOT YET)
+	•	Inject resolved IDs into final SQL (NOT YET)
 	•	Reduce LLM hallucination risk
 	•	Improve performance and cache efficiency
 

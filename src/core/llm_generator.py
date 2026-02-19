@@ -119,11 +119,38 @@ ROUND CODES:
 - 'R16' = Round of 16
 - 'R32' = Round of 32
 
+
 TITLE LOGIC:
 - "title" = winner_id in round = 'F'
 - "final played" = round='F' AND (winner_id=player OR loser_id=player)
 - "Grand Slam title" = round='F' AND tourney_level='G' AND winner_id=player
 - "Grand Slam final" = round='F' AND tourney_level='G' AND (winner_id=player OR loser_id=player)
+
+BOOLEAN LOGIC SAFETY RULE (CRITICAL):
+
+You MUST respect SQL operator precedence.
+
+- AND has higher precedence than OR.
+- Never generate conditions like:
+      A AND B OR C
+  without parentheses.
+
+If OR is required, you MUST wrap it explicitly:
+      A AND (B OR C)
+
+You are STRICTLY FORBIDDEN from generating tautologies such as:
+      m.tourney_level = 'G' OR m.tourney_level != 'G'
+
+When counting "titles", you MUST NOT broaden the scope
+by adding OR conditions that include non-final matches.
+
+Example of CORRECT title filter:
+      m.round = 'F'
+      AND m.tourney_level = 'G'
+
+Example of INCORRECT (FORBIDDEN):
+      m.round = 'F'
+      AND m.tourney_level = 'G' OR m.tourney_level != 'G'
 
 DATE RULES:
 - "before YEAR" → match_date < 'YEAR-01-01'
@@ -182,21 +209,43 @@ DATE ARITHMETIC RULE:
 
 Do NOT generate SQL that is incompatible with SQLite.
 
-ANTI-JOIN RULE (VERY IMPORTANT):
-NEVER use EXISTS or NOT EXISTS.
-If the logical condition requires exclusion,
-rewrite using LEFT JOIN + IS NULL.
+ANTI-JOIN RULE (ABSOLUTELY MANDATORY):
 
-Correct example:
+You are STRICTLY FORBIDDEN from using:
+- EXISTS
+- NOT EXISTS
+
+If you generate EXISTS or NOT EXISTS, the query is INVALID.
+
+You MUST always rewrite exclusion logic using:
+
+LEFT JOIN + IS NULL
+
+Correct exclusion pattern:
 
 SELECT p.first_name, p.last_name
 FROM players p
-JOIN matches m ON m.winner_id = p.player_id
-LEFT JOIN rankings r ON r.player_id = p.player_id AND r.rank = 1
-WHERE m.round = 'F'
-  AND m.tourney_level = 'G'
-  AND r.player_id IS NULL
-GROUP BY p.player_id, p.first_name, p.last_name;
+LEFT JOIN matches m ON m.winner_id = p.player_id
+                     AND m.round = 'F'
+                     AND m.tourney_level = 'G'
+                     AND m.tour = 'ATP'
+WHERE p.gender = 'ATP'
+  AND m.match_id IS NULL
+
+Rules:
+- ALL exclusion filters must live inside the LEFT JOIN ... ON clause.
+- The WHERE clause may ONLY contain:
+    - domain filters (ATP/WTA)
+    - player filters
+    - IS NULL checks for anti-joins
+- NEVER simulate NOT EXISTS with subqueries.
+- NEVER use NOT IN.
+- NEVER use correlated subqueries for exclusion.
+
+If the question requires "never", "without", "did not", "no", or similar exclusion logic,
+you MUST implement it with LEFT JOIN + IS NULL.
+
+This rule overrides all other stylistic preferences.
 
 JOIN ORDERING RULES (CRITICAL):
 
@@ -248,6 +297,21 @@ WTA if explicitly requested).
 This rule is mandatory to avoid performance issues and duplicate rows.
 
 RANK SNAPSHOT RULE (TEMPORAL CONSISTENCY – MANDATORY):
+
+PERCENTAGE STABILITY RULE:
+
+When computing win percentage or any ratio based on finals played,
+you MUST require a minimum sample size.
+
+Specifically:
+- When computing win percentage in finals,
+  add: HAVING COUNT(*) >= 3
+
+This rule prevents trivial 100% results from players
+who played only one final.
+
+Apply this rule only when computing percentage-based metrics.
+Do NOT apply it to simple counts.
 
 When a question refers to ranking "at the time", 
 "while ranked", 

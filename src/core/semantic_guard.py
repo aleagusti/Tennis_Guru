@@ -59,10 +59,18 @@ class SemanticGuard:
             flags=re.IGNORECASE,
         )
 
-        # Rewrite plain surface = 'X'
+        # Rewrite plain surface = 'X' → force LOWER comparison
         sql = re.sub(
             r"\bsurface\s*=\s*'[^']+'",
-            f"surface = '{detected}'",
+            f"lower(surface) = lower('{detected}')",
+            sql,
+            flags=re.IGNORECASE,
+        )
+
+        # Rewrite surface IN (...) → force canonical LOWER comparison
+        sql = re.sub(
+            r"\bsurface\s+IN\s*\([^)]*\)",
+            f"lower(surface) = lower('{detected}')",
             sql,
             flags=re.IGNORECASE,
         )

@@ -7,6 +7,22 @@ MAJOR.MINOR.PATCH
 
 ---
 
+## [0.5.0] - 2026-02-19
+
+### Improved
+- Stabilized ranking snapshot logic using `ranking_date <= match_date`
+- Fixed age-based title calculations using `DATE(p.dob, '+N years')`
+- Enforced minimum sample size in percentage aggregations (HAVING threshold)
+- Improved negative-logic stability using GROUP BY + HAVING patterns
+- Refined Big 3 comparison logic (Top 5 snapshot-based evaluation)
+- Improved benchmark timing accuracy (separated LLM generation vs SQL execution time)
+
+### Fixed
+- Resolved incorrect OR precedence in title-before-age queries
+- Eliminated cross-tour contamination in ranking joins
+- Fixed case-insensitive filtering inconsistencies
+- Removed accidental logical broadening (`OR m.tourney_level != 'G'`) in title queries
+
 ## [0.4.0] - 2026-02-18
 
 ### Added

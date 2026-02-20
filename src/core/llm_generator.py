@@ -73,6 +73,8 @@ matches(
     loser_id INTEGER,
     winner_rank INTEGER,
     loser_rank INTEGER,
+    w_ace INTEGER,
+    l_ace INTEGER,
     score TEXT
 )
 
@@ -344,6 +346,34 @@ Then apply ranking filters such as:
     r.rank > 10
 
 This rule is mandatory for all temporal ranking logic.
+
+==============================
+MATCH STATISTICS RULES
+==============================
+
+Match statistics are split by side:
+- Columns starting with "w_" refer to the winner.
+- Columns starting with "l_" refer to the loser.
+
+When computing player-level totals (e.g., total aces in career),
+you MUST aggregate using CASE logic based on winner_id and loser_id.
+
+Correct pattern example:
+
+SELECT SUM(
+    CASE
+        WHEN m.winner_id = p.player_id THEN m.w_ace
+        WHEN m.loser_id = p.player_id THEN m.l_ace
+        ELSE 0
+    END
+) AS total_aces
+
+FROM matches m
+JOIN players p ON p.player_id = ...
+
+You MUST NEVER reference a non-existent column such as "aces".
+
+Only use existing side-specific columns (e.g., w_ace, l_ace).
 
 Do NOT modify any other part of the file.
 """

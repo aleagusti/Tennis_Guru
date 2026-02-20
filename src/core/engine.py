@@ -2,14 +2,11 @@ from dataclasses import dataclass
 from typing import Optional, List, Tuple, Any
 
 from .cache import QUERY_CACHE
-from .context import LAST_CONTEXT
 from .router import (
     classify_intent,
     is_question_ambiguous,
-    is_followup_tourney_question,
     build_same_tournament_multi_defeat_query,
     build_final_ranking_query,
-    build_followup_tourney_query,
 )
 from .semantic_guard import SemanticGuard
 from .llm_generator import generate_sql_from_question, generate_nl_answer
@@ -37,7 +34,6 @@ class EngineResult:
     cached: bool = False
     needs_clarification: bool = False
     error: Optional[str] = None
-    followup: bool = False
 
 
 class TennisGuruEngine:
@@ -85,33 +81,7 @@ class TennisGuruEngine:
             )
 
         # =============================
-        # 3) Follow-up routing
-        # =============================
-        if is_followup_tourney_question(question, LAST_CONTEXT.get("last_sql")):
-            try:
-                sql = build_followup_tourney_query(LAST_CONTEXT["last_sql"])
-                results = execute_sql(sql, timeout_seconds=30)
-                return EngineResult(
-                    question=question,
-                    sql=sql,
-                    results=results,
-                    explanation="Contextual follow-up (deterministic).",
-                    llm_generation_time=None,
-                    followup=True,
-                )
-            except Exception as e:
-                return EngineResult(
-                    question=question,
-                    sql=None,
-                    results=None,
-                    explanation=None,
-                    llm_generation_time=None,
-                    followup=True,
-                    error=str(e),
-                )
-
-        # =============================
-        # 4) Deterministic routing
+        # 3) Deterministic routing
         # =============================
         intent = classify_intent(question)
         sql = None
@@ -127,7 +97,7 @@ class TennisGuruEngine:
             explanation = "Deterministic template: ranking at specific final."
 
         # =============================
-        # 5) LLM fallback
+        # 4) LLM fallback
         # =============================
         if not sql:
             try:
@@ -143,7 +113,7 @@ class TennisGuruEngine:
                 )
 
         # =============================
-        # 6) Semantic validation + structural rewrite
+        # 5) Semantic validation + structural rewrite
         # =============================
         generated_sql = sql
         try:
@@ -162,7 +132,7 @@ class TennisGuruEngine:
             )
 
         # =============================
-        # 7) Execute SQL
+        # 6) Execute SQL
         # =============================
         # Debug: print final SQL before execution
         print("\n--- FINAL SQL ---\n")
@@ -181,14 +151,8 @@ class TennisGuruEngine:
             )
 
         # =============================
-        # 8) Update context + cache
+        # 7) Update context + cache
         # =============================
-        LAST_CONTEXT["last_sql"] = sql
-        LAST_CONTEXT["last_intent"] = intent
-
-        # Store last player names if result looks like names
-        if results and len(results[0]) >= 2 and all(isinstance(col, str) for col in results[0][:2]):
-            LAST_CONTEXT["last_player_names"] = [(r[0], r[1]) for r in results]
 
         QUERY_CACHE[q_norm] = {
             "sql": sql,

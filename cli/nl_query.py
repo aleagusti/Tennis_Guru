@@ -32,10 +32,6 @@ def main():
         if res.cached:
             print("\n⚡ Cached result used.")
 
-        if res.sql:
-            print("\n--- Generated SQL ---\n")
-            print(res.sql)
-
         if res.explanation:
             print("\n--- Explanation ---\n")
             print(res.explanation)

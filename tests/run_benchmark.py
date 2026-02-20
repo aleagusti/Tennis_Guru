@@ -115,9 +115,121 @@ def benchmark():
 
         results.append(entry)
 
-    # Persist results
+    # -------------------------------
+    # Classification buckets
+    # -------------------------------
+    total_questions = len(results)
+
+    successes = [
+        r for r in results
+        if r.get("error") is None and not r.get("needs_clarification")
+    ]
+
+    clarifications = [
+        r for r in results
+        if r.get("needs_clarification") is True
+    ]
+
+    timeouts = [
+        r for r in results
+        if r.get("timeout") is True
+    ]
+
+    interruptions = [
+        r for r in results
+        if r.get("error") == "interrupted"
+    ]
+
+    sql_errors = [
+        r for r in results
+        if r.get("error") is not None
+        and not r.get("needs_clarification")
+        and r.get("error") != "interrupted"
+    ]
+
+    executable_total = total_questions - len(clarifications)
+
+    # -------------------------------
+    # Timing metrics (only successes)
+    # -------------------------------
+    avg_llm_time = (
+        round(
+            sum(r["llm_generation_time"] or 0 for r in successes)
+            / len(successes),
+            4,
+        )
+        if successes else 0
+    )
+
+    avg_sql_time = (
+        round(
+            sum(r["sql_execution_time"] or 0 for r in successes)
+            / len(successes),
+            4,
+        )
+        if successes else 0
+    )
+
+    slowest = sorted(
+        successes,
+        key=lambda x: x.get("sql_execution_time") or 0,
+        reverse=True,
+    )[:3]
+
+    print("\n==============================")
+    print("Benchmark Summary")
+    print("==============================")
+    print(f"Total questions: {total_questions}")
+    print(f"Successful executions: {len(successes)}")
+    print(f"Clarifications (expected behavior): {len(clarifications)}")
+    print(f"SQL errors: {len(sql_errors)}")
+    print(f"Timeouts: {len(timeouts)}")
+    print(f"Interrupted executions: {len(interruptions)}")
+
+    if executable_total > 0:
+        success_rate = len(successes) / executable_total
+        print(f"Executable success rate: {success_rate:.2%}")
+
+    print(f"Average LLM generation time: {avg_llm_time}s")
+    print(f"Average total execution time: {avg_sql_time}s")
+
+    print("\nTop 3 slowest queries:")
+    for r in slowest:
+        print(f" - {r['question']} ({r.get('sql_execution_time')}s)")
+
+    # -------------------------------
+    # Build summary object
+    # -------------------------------
+    summary = {
+        "total_questions": total_questions,
+        "successful_executions": len(successes),
+        "clarifications": len(clarifications),
+        "sql_errors": len(sql_errors),
+        "timeouts": len(timeouts),
+        "interruptions": len(interruptions),
+        "executable_success_rate": (
+            round(len(successes) / executable_total, 4)
+            if executable_total > 0 else None
+        ),
+        "average_llm_generation_time": avg_llm_time,
+        "average_total_execution_time": avg_sql_time,
+        "top_3_slowest": [
+            {
+                "question": r["question"],
+                "execution_time": r.get("sql_execution_time")
+            }
+            for r in slowest
+        ]
+    }
+
+    # Persist full benchmark report
+    report = {
+        "summary": summary,
+        "results": results
+    }
+
     with open(LOG_FILE, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
+        json.dump(report, f, indent=2)
 
     print("\nBenchmark complete.")
     print(f"Results saved to {LOG_FILE}")

@@ -24,6 +24,14 @@ def load_matches_for_tour(tour_folder, gender):
         print(f"Loading {file_path.name}...")
         df = pd.read_csv(file_path)
 
+        if "w_ace" not in df.columns:
+            df["w_ace"] = None
+        if "l_ace" not in df.columns:
+            df["l_ace"] = None
+
+        df["w_ace"] = pd.to_numeric(df["w_ace"], errors="coerce")
+        df["l_ace"] = pd.to_numeric(df["l_ace"], errors="coerce")
+        
         df["match_date"] = pd.to_datetime(df["tourney_date"], format="%Y%m%d", errors="coerce")
         df["tour"] = gender
 
@@ -52,6 +60,8 @@ def main():
         "loser_id",
         "winner_rank",
         "loser_rank",
+        "w_ace",
+        "l_ace",
         "score"
     ]].copy()
     atp_clean = atp_clean[atp_clean["match_date"].notna()]
@@ -75,6 +85,8 @@ def main():
         "loser_id",
         "winner_rank",
         "loser_rank",
+        "w_ace",
+        "l_ace",
         "score"
     ]].copy()
     wta_clean = wta_clean[wta_clean["match_date"].notna()]

@@ -7,7 +7,7 @@ A1 — Performance
 	•	Add query execution timer (DONE v0.2.x)
 	•	Add optional EXPLAIN QUERY PLAN debug mode
 	•	Detect and reject extremely expensive queries
-	•	Add structured logging (question, SQL, execution time, simplification triggered) (PARTIAL — benchmark logging implemented)
+	•	Add structured logging (question, SQL, execution time, simplification triggered) (PARTIAL — benchmark logging implemented, history persistence implemented)
 	•	Add query benchmark runner (DONE v0.2.x)
 	•	Track LLM generation time separately from SQL execution time (DONE v0.2.x)
 
@@ -30,7 +30,7 @@ A4 — Robustness
 	•	Add execution timeout (DONE v0.2.x)
 	•	Add max-row safeguard
 	•	Add retry with exponential backoff for OpenAI RateLimitError
-	•	Add debug mode (--raw, --debug)
+	•	Add debug mode (--raw, --debug) (PARTIAL — debug prints implemented in CLI)
 	•	Persist query history to logs/query_history.json (DONE v0.2.x)
 	•	Deterministic template fallback before LLM execution (IMPLEMENTED v0.3.0)
 
@@ -47,7 +47,7 @@ Un motor histórico robusto, presentable en portfolio serio.
 🎯 Objetivo: Profesionalizar la arquitectura interna antes de seguir agregando features.
 
 HP1 — Modularization (Refactor estructural)
-	•	Split nl_query.py into modules:
+	•	Split nl_query.py into modules (DONE — refactored into core modules)
 		•	intent_router.py
 		•	deterministic_handlers.py
 		•	llm_generator.py
@@ -55,7 +55,7 @@ HP1 — Modularization (Refactor estructural)
 		•	sql_validator.py
 		•	executor.py
 		•	memory.py
-	•	Keep nl_query.py as lightweight orchestrator (CLI + engine bootstrap)
+	•	Keep nl_query.py as lightweight orchestrator (CLI + engine bootstrap) (DONE)
 	•	Reduce monolithic file complexity
 	•	Enable unit testing per module
 
@@ -83,8 +83,8 @@ HP4 — SQL Parsing Upgrade
 	•	Improve robustness of semantic corrections
 
 HP5 — Engine Class Abstraction
-	•	Create TennisGuruEngine class
-	•	Move orchestration logic into process(question)
+	•	Create TennisGuruEngine class (DONE)
+	•	Move orchestration logic into process(question) (DONE)
 	•	Allow future:
 		•	API integration
 		•	Web UI reuse
@@ -100,12 +100,12 @@ Base arquitectónica sólida, mantenible y escalable antes de continuar con expa
 🎯 Objetivo: Medir capacidad real de razonamiento NL → SQL y documentar performance.
 
 A+1 — Stress Test Suite
-	•	Create tests/stress_tests.txt
+	•	Create tests/stress_tests.txt (DONE)
 	•	Categorize questions by reasoning difficulty (Level 1–5)
 	•	Include negative logic, temporal logic, aggregations, comparisons
 
 A+2 — Benchmark Runner
-	•	Create tests/run_benchmark.py
+	•	Create tests/run_benchmark.py (DONE)
 	•	Execute all stress questions automatically
 	•	Measure:
 		•	LLM generation time
@@ -113,13 +113,13 @@ A+2 — Benchmark Runner
 		•	Simplification triggered (yes/no)
 		•	Timeout occurrences
 		•	Empty result anomalies
-	•	Persist results to logs/query_benchmark.json
+	•	Persist results to logs/query_benchmark.json (DONE)
 
 A+3 — Metrics & Evaluation
-	•	Compute average execution time
-	•	Compute simplification rate
-	•	Compute failure rate
-	•	Identify worst-performing queries
+	•	Compute average execution time (PARTIAL — raw benchmark data available)
+	•	Compute simplification rate (PARTIAL — data available in benchmark logs)
+	•	Compute failure rate (PARTIAL — data available in benchmark logs)
+	•	Identify worst-performing queries (PARTIAL — manual inspection possible)
 	•	Generate summary report for README
 
 👉 Resultado del Stage A+:

@@ -79,6 +79,9 @@ CREATE TABLE matches (
     
     winner_rank INTEGER,
     loser_rank INTEGER,
+
+    w_ace INTEGER,
+    l_ace INTEGER,
     
     score TEXT
 );

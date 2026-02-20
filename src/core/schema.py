@@ -41,8 +41,15 @@ matches(
     loser_id INTEGER,
     winner_rank INTEGER,
     loser_rank INTEGER,
+    w_ace INTEGER,
+    l_ace INTEGER,
     score TEXT
 )
+Note:
+Match statistics are split by side:
+- Columns starting with "w_" refer to the winner.
+- Columns starting with "l_" refer to the loser.
+To compute player-level totals, use CASE on winner_id and loser_id.
 """
 
 # -------------------------------------------------

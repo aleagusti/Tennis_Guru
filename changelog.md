@@ -6,6 +6,30 @@ This project follows Semantic Versioning:
 MAJOR.MINOR.PATCH
 
 ---
+## [1.0.0] - 2026-02-20
+
+### Added
+- Streamlit web interface (`app/app.py`) for interactive portfolio demo
+- Dynamic result table header extraction from SQL `AS` aliases
+- Winner/loser match statistics support (w_ace / l_ace) in LLM schema prompt
+- Player-level aggregation logic for match stats using CASE (winner_id / loser_id)
+- Spanish term mapping for "torneos ganados", "partidos ganados" and related queries
+
+### Removed
+- Contextual follow-up system (`LAST_CONTEXT`) due to instability and ambiguity issues
+- Follow-up routing logic from `engine.py`
+
+### Improved
+- Multi-metric aggregation queries (titles, matches, aces) now generate correctly structured SQL
+- Header rendering decoupled from fixed column shapes (no more 0/1/2 headers)
+- Better complex SELECT alias handling in frontend layer
+- Cleaner separation between core engine logic and UI layer
+- Demo stability for portfolio presentation
+
+### Fixed
+- Ace aggregation queries now correctly use CASE over winner_id / loser_id
+- Eliminated NULL-returning stat queries caused by incomplete schema exposure
+- Restored clean Streamlit app structure after accidental prompt overwrite
 
 ## [0.5.0] - 2026-02-19
 
